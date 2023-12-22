@@ -1,0 +1,17 @@
+
+|22-12-2023 21:02:20
+Аккаунт: +66 8 1481 9110
+Группа: Услуги Джонни 2.0
+Ошибка: 
+A wait of 3403 seconds is required before sending another message in this chat (caused by SendMessageRequest)
+
+
+Сообщение не отправлено
+|22-12-2023 21:02:20
+Аккаунт: +66 8 1481 9110
+Группа: Услуги Джонни 3.0
+Ошибка: 
+A wait of 764 seconds is required before sending another message in this chat (caused by SendMessageRequest)
+
+
+Сообщение не отправлено

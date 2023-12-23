@@ -143,6 +143,10 @@ async def input_code(message: Message, state: FSMContext):
 async def add_tg_acc(message: Message, state: FSMContext):
     try:
         data = await state.get_data()
+        if data['proxy'] == 'нет':
+            data['proxy'] = 'no'
+        elif data['password'] == 'нет':
+            data['password'] = 'no'
         print(data)
         password = data['password']
         print(password)

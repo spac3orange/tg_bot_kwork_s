@@ -66,7 +66,7 @@ class Database:
                 CREATE TABLE IF NOT EXISTS telegram_accounts (
                     phone TEXT PRIMARY KEY,
                     comments_sent INTEGER DEFAULT 0,
-                    proxy TEXT DEFAULT 'нет',
+                    proxy TEXT DEFAULT 'no',
                     status TEXT DEFAULT 'Active'
                 )
             """)

@@ -26,7 +26,7 @@ async def get_info(accounts: list) -> List[Tuple[str]]:
             accs_info.append(await sess.get_info())
         except Exception as e:
             print(e)
-    print(f'accs_info = {accs_info}')
+    #print(f'accs_info = {accs_info}')
     return accs_info
 
 
@@ -193,7 +193,7 @@ async def acc_edit_avatar(callback: CallbackQuery, state: FSMContext):
 async def process_photo(message: Message, state: FSMContext):
     uid = message.from_user.id
     state_data = await state.get_data()
-    print(state_data)
+    #print(state_data)
     account = state_data['account']
     session = AuthTelethon(account)
     try:

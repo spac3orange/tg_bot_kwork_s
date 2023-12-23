@@ -62,11 +62,9 @@ class AuthTelethon:
         logger.info('Attempting to sign in...')
         if code:
             if password:
-                print(1)
                 print(password)
                 await self.client.sign_in(phone=self.phone, code=code, password=password)
             else:
-                print(2)
                 await self.client.sign_in(phone=self.phone, code=code)
 
         else:
@@ -100,8 +98,8 @@ class AuthTelethon:
             for dialog in groups_and_channels:
                 dialog = await self.client.get_entity(dialog)
                 dialog_username = dialog.username
-                print(f'dialog_username: {dialog_username}')
-                print(f'dialog_link: {group_link}')
+                #print(f'dialog_username: {dialog_username}')
+                #print(f'dialog_link: {group_link}')
                 try:
                     if dialog_username == group_link:
                         self.client.disconnect()
@@ -194,7 +192,6 @@ class AuthTelethon:
         await self.client.connect()
         try:
             p = await self.client.get_profile_photos('me')
-            print(p)
             for photo in p:
                 await self.client(DeletePhotosRequest(
                     id=[InputPhoto(
@@ -256,12 +253,12 @@ class TelethonConnect:
 
             phone = self.session_name.split('/')[-1].rstrip('.session')
             print(phone)
-            print(f'Тел: {me.phone}\n'
-                  f'ID: {me.id}\n'
-                  f'Ник: {me.username}\n'
-                  f'Биография: {about}\n'
-                  f'Ограничения: {me.restricted}\n'
-                  f'Причина ограничений: {me.restriction_reason}\n')
+            #print(f'Тел: {me.phone}\n'
+            #      f'ID: {me.id}\n'
+            #      f'Ник: {me.username}\n'
+            #      f'Биография: {about}\n'
+            #      f'Ограничения: {me.restricted}\n'
+            #      f'Причина ограничений: {me.restriction_reason}\n')
 
             return me.phone, me.id, me.first_name, me.last_name, me.username, me.restricted, about
             # full = await self.client(GetFullUserRequest('username'))

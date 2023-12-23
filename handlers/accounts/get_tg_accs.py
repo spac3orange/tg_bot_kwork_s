@@ -29,7 +29,7 @@ async def get_info(accounts: list, uid) -> List[Tuple[str]]:
                 continue
         except Exception as e:
             print(e)
-    print(f'accs_info = {accs_info}')
+    #print(f'accs_info = {accs_info}')
     return accs_info
 
 

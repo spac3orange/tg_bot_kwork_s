@@ -115,13 +115,11 @@ async def save_message(message: Message, state: FSMContext):
                                       parse_mode='HTML', reply_markup=main_kb.spam_settings())
         await state.clear()
         return
-    print(1)
     await state.update_data(timing=message.text)
     state_data = await state.get_data()
     date, accounts, user_message, timing = state_data.values()
     accounts = '\n'.join(accounts)
-    print(state_data)
-    print(2)
+    #print(state_data)
     await message.answer(f'<b>Дата:</b> {date}'
                          f'\n<b>Аккаунты:</b> {accounts}'
                          f'\n<b>Сообщение:</b> \n{user_message}'

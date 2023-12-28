@@ -1,4 +1,6 @@
 import asyncio
+import random
+
 from aiogram.types import CallbackQuery
 from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
@@ -19,7 +21,8 @@ async def get_info(accounts: list, uid) -> List[Tuple[str]]:
     accs_info = []
     for session in accounts:
         try:
-            await asyncio.sleep(1)
+            slp = random.randint(0, 5)
+            await asyncio.sleep(slp)
             sess = TelethonConnect(session)
             acc_info = await sess.get_info()
             if acc_info:
@@ -41,10 +44,13 @@ async def get_acc_info(callback: CallbackQuery, state: FSMContext):
     await callback.message.answer('Запрашиваю информацию о подключенных аккаунтах...')
     try:
         accounts = await accs_action.db_get_all_accounts()
+        await asyncio.sleep(1)
         if accounts:
             phone_list = [acc['phone'] for acc in accounts]
             proxy_list = [acc['proxy'] for acc in accounts]
-            acc_info = await get_info(phone_list, uid)
+            acc_info = asyncio.create_task(get_info(phone_list, uid))
+            acc_info = await acc_info
+            await asyncio.sleep(1)
             if acc_info:
                 string = ''
                 for (phone, id, first_name, last_name, username, restricted, about), proxy in zip(acc_info, proxy_list):

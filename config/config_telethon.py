@@ -237,7 +237,7 @@ class TelethonConnect:
     async def get_info(self):
         try:
             logger.info(f'Getting info about account {self.session_name}...')
-            slp = random.randint(1, 3)
+            slp = random.randint(0, 5)
             await asyncio.sleep(slp)
             await self.client.connect()
             if not await self.client.is_user_authorized():
@@ -248,7 +248,8 @@ class TelethonConnect:
             me = await self.client.get_me()
             full_me = await self.client(GetFullUserRequest(me.username))
             about = full_me.full_user.about or 'Не установлено'
-            print(about)
+            #print(about)
+            await asyncio.sleep(1)
             await self.client.disconnect()
 
             phone = self.session_name.split('/')[-1].rstrip('.session')
@@ -269,6 +270,11 @@ class TelethonConnect:
             asyncio.create_task(database.accs_action.db_add_banned_account(acc))
             adm_mess = f'Аккаунт {acc} заблокирован.'
             await inform_admins(adm_mess)
+            await self.client.disconnect()
+            return
+        except Exception as e:
+            logger.error(e)
+            await self.client.disconnect()
             return
 
     async def spam_groups(self, user_message, timing):

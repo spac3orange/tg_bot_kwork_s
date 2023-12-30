@@ -21,7 +21,8 @@ async def process_accounts_menu(callback: CallbackQuery, state: FSMContext):
         await callback.message.answer(acc_string, parse_mode='HTML')
         acc_string = ''
     banned_accounts = await accs_action.get_banned_phones()
-    await callback.message.answer(f'\n\n<b>Забаненные аккаунты:</b> {len(banned_accounts)}'
+    await callback.message.answer(f'<b>Активные аккаунты:</b> {len(accounts)}'
+                                  f'\n<b>Забаненные аккаунты:</b> {len(banned_accounts)}'
                                   '\n\n<b>Настройки Telegram аккаунтов</b>: ', parse_mode='HTML', reply_markup=main_kb.accs_settings_menu())
 
     await state.clear()

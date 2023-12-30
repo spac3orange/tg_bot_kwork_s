@@ -67,8 +67,11 @@ async def db_add_banned_account(phone_number: str) -> None:
 
 async def db_increment_comments_sent(phone_number: str) -> None:
     try:
-        query = "UPDATE telegram_accounts SET comments_sent = comments_sent + 1 WHERE phone = $1"
-        await db.execute_query(query, phone_number)
+        query = "SELECT comments_sent FROM telegram_accounts WHERE phone = $1 FOR UPDATE"
+        result = await db.fetch_one(query, phone_number)
+        comments_sent = result['comments_sent'] + 1
+        query = "UPDATE telegram_accounts SET comments_sent = $1 WHERE phone = $2"
+        await db.execute_query(query, comments_sent, phone_number)
         logger.info(f"Value of comments_sent for Telegram account {phone_number} incremented by 1")
     except (Exception, asyncpg.PostgresError) as error:
         logger.error(f"Error incrementing comments_sent for Telegram account in the database: {error}")

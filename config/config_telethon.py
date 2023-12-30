@@ -284,10 +284,11 @@ class TelethonConnect:
             groups_and_channels = [dialog for dialog in dialogs if dialog.is_group]
             for dialog in groups_and_channels:
                 try:
-                    timing = timing * 60
+                    randnum = random.randint(0, 10)
+                    timing = timing * 60 + randnum
                     dialog = await self.client.get_entity(dialog)
                     await self.client.send_message(dialog, user_message)
-                    print(dialog.to_dict())
+                    print(dialog.title)
                     logger.info(f'Account {self.session_name.split("/")[-1]} successfully sent message to {dialog.title}')
                     await self.write_history(dialog)
                     await asyncio.sleep(timing)
@@ -304,6 +305,9 @@ class TelethonConnect:
             asyncio.create_task(database.accs_action.db_add_banned_account(acc))
             adm_mess = f'Аккаунт {acc} заблокирован.'
             await inform_admins(adm_mess)
+
+        finally:
+            await self.client.disconnect()
 
     async def write_history(self, dialog):
         # Запись отправленного комментария в файл

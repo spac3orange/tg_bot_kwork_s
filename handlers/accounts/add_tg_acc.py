@@ -25,6 +25,20 @@ async def acc_in_table(phone):
             return True
         return False
 
+async def process_cancel(message, state):
+    accounts = await accs_action.db_get_all_accounts()
+    banned_accounts = await accs_action.get_banned_phones()
+    phones = [acc['phone'] for acc in accounts]
+    sent_msg = [acc['comments_sent'] for acc in accounts]
+    acc_string = ''
+    for phone, msg in zip(phones, sent_msg):
+        acc_string += f'\n\n<b>Аккаунт:</b> {phone} \n<b>Отправлено сообщений:</b> {msg}'
+        await message.answer(acc_string, parse_mode='HTML')
+        acc_string = ''
+    banned_accounts = await accs_action.get_banned_phones()
+    await message.answer(f'\n\n<b>Забаненные аккаунты:</b> {len(banned_accounts)}'
+                                  '\n\n<b>Настройки Telegram аккаунтов</b>: ', parse_mode='HTML', reply_markup=main_kb.accs_settings_menu())
+    await state.clear()
 
 @router.callback_query(F.data == 'tg_accs_add')
 async def input_proxy(callback: CallbackQuery, state: FSMContext):
@@ -44,19 +58,7 @@ async def input_proxy(callback: CallbackQuery, state: FSMContext):
 @router.message(AddTgAccState.input_proxy)
 async def input_phone(message: Message, state: FSMContext):
     if message.text == '/cancel':
-        accounts = await accs_action.db_get_all_accounts()
-        banned_accounts = await accs_action.get_banned_phones()
-        phones = [acc['phone'] for acc in accounts]
-        sent_msg = [acc['comments_sent'] for acc in accounts]
-        acc_string = ''
-        for phone, msg in zip(phones, sent_msg):
-            acc_string += f'\n\n<b>Аккаунт:</b> {phone} \n<b>Отправлено сообщений:</b> {msg}'
-
-        await message.answer(f'<b>Активные аккаунты:</b> {len(accounts)}'
-                                      f'{acc_string}'
-                                      f'\n\n<b>Забаненные аккаунты:</b> {len(banned_accounts)}'
-                                      '\n\n<b>Настройки Telegram аккаунтов</b>: ', parse_mode='HTML', reply_markup=main_kb.accs_settings_menu())
-        await state.clear()
+        await process_cancel(message, state)
         return
 
     await state.update_data(proxy=message.text)
@@ -69,19 +71,7 @@ async def input_phone(message: Message, state: FSMContext):
 @router.message(AddTgAccState.input_2fa)
 async def input_2fa(message: Message, state: FSMContext):
     if message.text == '/cancel':
-        accounts = await accs_action.db_get_all_accounts()
-        banned_accounts = await accs_action.get_banned_phones()
-        phones = [acc['phone'] for acc in accounts]
-        sent_msg = [acc['comments_sent'] for acc in accounts]
-        acc_string = ''
-        for phone, msg in zip(phones, sent_msg):
-            acc_string += f'\n\n<b>Аккаунт:</b> {phone} \n<b>Отправлено сообщений:</b> {msg}'
-
-        await message.answer(f'<b>Активные аккаунты:</b> {len(accounts)}'
-                             f'{acc_string}'
-                             f'\n\n<b>Забаненные аккаунты:</b> {len(banned_accounts)}'
-                             '\n\n<b>Настройки Telegram аккаунтов</b>: ', parse_mode='HTML', reply_markup=main_kb.accs_settings_menu())
-        await state.clear()
+        await process_cancel(message, state)
         return
 
     await message.answer('Введите пароль 2fa:\n'
@@ -94,19 +84,7 @@ async def input_2fa(message: Message, state: FSMContext):
 @router.message(AddTgAccState.input_number)
 async def input_code(message: Message, state: FSMContext):
     if message.text == '/cancel':
-        accounts = await accs_action.db_get_all_accounts()
-        banned_accounts = await accs_action.get_banned_phones()
-        phones = [acc['phone'] for acc in accounts]
-        sent_msg = [acc['comments_sent'] for acc in accounts]
-        acc_string = ''
-        for phone, msg in zip(phones, sent_msg):
-            acc_string += f'\n\n<b>Аккаунт:</b> {phone} \n<b>Отправлено сообщений:</b> {msg}'
-
-        await message.answer(f'<b>Активные аккаунты:</b> {len(accounts)}'
-                             f'{acc_string}'
-                             f'\n\n<b>Забаненные аккаунты:</b> {len(banned_accounts)}'
-                             '\n\n<b>Настройки Telegram аккаунтов</b>: ', parse_mode='HTML', reply_markup=main_kb.accs_settings_menu())
-        await state.clear()
+        await process_cancel(message, state)
         return
 
     await state.update_data(password=message.text)

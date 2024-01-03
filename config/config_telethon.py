@@ -313,7 +313,7 @@ class TelethonConnect:
         # Запись отправленного комментария в файл
         async with aiofiles.open(f'history/history_{self.session_name.split("/")[-1].rstrip(".session")}.txt', 'a', encoding='utf-8') as file:
             timestamp = datetime.now().strftime('%d-%m-%Y %H:%M:%S')
-            await file.write(f'\n|{timestamp}:'
+            await file.write(f'\n\n|{timestamp}:'
                              f'\nАккаунт: {self.session_name.split("/")[-1].rstrip(".session")}'
                              f'\nГруппа: {dialog.title}'
                              f'\nСообщение отправлено')
@@ -322,7 +322,7 @@ class TelethonConnect:
     async def write_error(self, dialog, e):
         async with aiofiles.open(f'history/errors_{self.session_name.split("/")[-1].rstrip(".session")}.txt', 'a', encoding='utf-8') as file:
             timestamp = datetime.now().strftime('%d-%m-%Y %H:%M:%S')
-            await file.write(f'\n|{timestamp}'
+            await file.write(f'\n\n|{timestamp}'
                              f'\nАккаунт: {self.session_name.split("/")[-1].rstrip(".session")}'
                              f'\nГруппа: {dialog.title}'
                              f'\nОшибка: \n{e}\n\n'

@@ -38,9 +38,9 @@ async def get_acc_history(callback: CallbackQuery):
     phone = callback.data.split('_')[-1]
     file = await get_account_history(phone)
     file_errors = await get_account_history_errors(phone)
+    if not file and not file_errors:
+        await callback.message.answer(f'История аккаунта <b>{phone}</b> не найдена.', parse_mode='HTML')
     if file:
         await callback.message.answer_document(document=file, caption=f'История аккаунта {phone}')
-    elif file_errors:
+    if file_errors:
         await callback.message.answer_document(document=file_errors, caption=f'Ошибки аккаунта {phone}')
-    else:
-        await callback.message.answer(f'История аккаунта <b>{phone}</b> не найдена.', parse_mode='HTML')

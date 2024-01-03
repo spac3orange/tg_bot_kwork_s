@@ -112,7 +112,6 @@ class AuthTelethon:
 
             await self.client(JoinChannelRequest(entity))
             logger.info('Joined group successfully')
-            await self.client.disconnect()
             return 'joined'
 
         except errors.UserDeactivatedBanError as e:
@@ -120,60 +119,65 @@ class AuthTelethon:
             return 'banned'
         except Exception as e:
             logger.error(f'Error joining group: {e}')
-            await self.client.disconnect()
             return False
+        finally:
+            await self.client.disconnect()
+
 
     async def change_first_name(self, first_name: str):
         try:
             await self.client.connect()
             await self.client(UpdateProfileRequest(first_name=first_name))
             logger.info(f'Changed first name to {first_name}')
-            await self.client.disconnect()
             return True
         except Exception as e:
             logger.error(f'Error changing first name: {e}')
-            await self.client.disconnect()
             return False
+        finally:
+            await self.client.disconnect()
+
 
     async def change_last_name(self, last_name: str):
         try:
             await self.client.connect()
             await self.client(UpdateProfileRequest(last_name=last_name))
             logger.info(f'Changed last name to {last_name}')
-            await self.client.disconnect()
             return True
         except Exception as e:
             logger.error(f'Error changing last name: {e}')
-            await self.client.disconnect()
             return False
+        finally:
+            await self.client.disconnect()
+
+
 
     async def change_username(self, username: str):
         try:
             await self.client.connect()
             await self.client(UpdateUsernameRequest(username))
             logger.info(f'Changed username to {username}')
-            await self.client.disconnect()
             return 'done'
         except UsernameOccupiedError as e:
             logger.error(f'Error changing username: {e}')
-            await self.client.disconnect()
             return 'username_taken'
         except Exception as e:
             logger.error(f'Error changing username: {e}')
-            await self.client.disconnect()
             return False
+        finally:
+            await self.client.disconnect()
+
 
     async def change_bio(self, bio: str):
         try:
             await self.client.connect()
             await self.client(UpdateProfileRequest(about=bio))
             logger.info('Changed bio')
-            await self.client.disconnect()
             return True
         except Exception as e:
             logger.error(f'Error changing bio: {e}')
-            await self.client.disconnect()
             return False
+        finally:
+            await self.client.disconnect()
 
     async def change_profile_photo(self, photo_path: str):
         try:
@@ -185,8 +189,9 @@ class AuthTelethon:
             return True
         except Exception as e:
             logger.error(f'Error changing profile photo: {e}')
-            await self.client.disconnect()
             return False
+        finally:
+            await self.client.disconnect()
 
     async def delete_all_profile_photos(self):
         await self.client.connect()
@@ -250,7 +255,6 @@ class TelethonConnect:
             about = full_me.full_user.about or 'Не установлено'
             #print(about)
             await asyncio.sleep(1)
-            await self.client.disconnect()
 
             phone = self.session_name.split('/')[-1].rstrip('.session')
             print(phone)
@@ -270,12 +274,13 @@ class TelethonConnect:
             asyncio.create_task(database.accs_action.db_add_banned_account(acc))
             adm_mess = f'Аккаунт {acc} заблокирован.'
             await inform_admins(adm_mess)
-            await self.client.disconnect()
             return
         except Exception as e:
             logger.error(e)
-            await self.client.disconnect()
             return
+        finally:
+            await self.client.disconnect()
+
 
     async def spam_groups(self, user_message, timing):
         try:

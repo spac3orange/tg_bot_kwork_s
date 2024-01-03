@@ -22,6 +22,7 @@ from utils import inform_admins
 
 class AuthTelethon:
     def __init__(self, phone: str, proxy=None):
+        # phone
         self.phone = phone
         env = Env()
         env.read_env()

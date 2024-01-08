@@ -1,6 +1,6 @@
 import asyncio
 import random
-from telethon import TelegramClient, errors
+from telethon import TelegramClient, errors, functions
 from environs import Env
 from telethon.tl.functions.messages import SendMessageRequest
 from telethon.tl.types import InputPeerChannel
@@ -19,6 +19,8 @@ from telethon.tl.types import InputPhoto
 import aiofiles
 import database
 from utils import inform_admins
+import re
+
 
 class AuthTelethon:
     def __init__(self, phone: str, proxy=None):
@@ -45,6 +47,8 @@ class AuthTelethon:
         user, password = user_pass.split(':')
         proxy = ('socks5', *address.split(':'), user, password)
         return proxy
+
+
 
     async def login_phone(self):
         try:
@@ -240,6 +244,22 @@ class TelethonConnect:
         proxy = ('socks5', *address.split(':'), user, password)
         return proxy
 
+    async def check_spamblock_status(self, client: TelegramClient):
+        logger.info('Checking account spam block...')
+        try:
+            await client(functions.contacts.UnblockRequest('@SpamBot'))
+            async with client.conversation('@SpamBot') as conv:
+                await conv.send_message('/start')
+                msg = await conv.get_response()
+            if 'Ваш аккаунт временно ограничен' in msg.text:
+                return 'до ' + str(re.findall(r'(?<=сняты ).+(?= \(по)', msg.text)[0])
+            elif 'Ваш аккаунт ограничен' in msg.text:
+                return 'Ограничен навсегда'
+        except Exception as e:
+            logger.error(e)
+            return 'Ошибка при выполнении запроса'
+        return 'Нет'
+
     async def get_info(self):
         try:
             logger.info(f'Getting info about account {self.session_name}...')
@@ -254,6 +274,7 @@ class TelethonConnect:
             me = await self.client.get_me()
             full_me = await self.client(GetFullUserRequest(me.username))
             about = full_me.full_user.about or 'Не установлено'
+            spam_block = await self.check_spamblock_status(client=self.client)
             #print(about)
             await asyncio.sleep(1)
 
@@ -266,13 +287,13 @@ class TelethonConnect:
             #      f'Ограничения: {me.restricted}\n'
             #      f'Причина ограничений: {me.restriction_reason}\n')
 
-            return me.phone, me.id, me.first_name, me.last_name, me.username, me.restricted, about
+            return me.phone, me.id, me.first_name, me.last_name, me.username, spam_block, about
             # full = await self.client(GetFullUserRequest('username'))
 
         except errors.UserDeactivatedBanError as e:
             logger.error(e)
             acc = self.session_name.split("/")[-1].rstrip('.session')
-            asyncio.create_task(database.accs_action.db_add_banned_account(acc))
+            await asyncio.create_task(database.accs_action.db_add_banned_account(acc))
             adm_mess = f'Аккаунт {acc} заблокирован.'
             await inform_admins(adm_mess)
             return
@@ -308,7 +329,7 @@ class TelethonConnect:
         except errors.UserDeactivatedBanError as e:
             logger.error(e)
             acc = self.session_name.split("/")[-1].rstrip('.session')
-            asyncio.create_task(database.accs_action.db_add_banned_account(acc))
+            await asyncio.create_task(database.accs_action.db_add_banned_account(acc))
             adm_mess = f'Аккаунт {acc} заблокирован.'
             await inform_admins(adm_mess)
 
@@ -323,7 +344,7 @@ class TelethonConnect:
                              f'\nАккаунт: {self.session_name.split("/")[-1].rstrip(".session")}'
                              f'\nГруппа: {dialog.title}'
                              f'\nСообщение отправлено')
-        asyncio.create_task(database.accs_action.db_increment_comments_sent(self.session_name.split("/")[-1].rstrip(".session")))
+        await asyncio.create_task(database.accs_action.db_increment_comments_sent(self.session_name.split("/")[-1].rstrip(".session")))
 
     async def write_error(self, dialog, e):
         async with aiofiles.open(f'history/errors_{self.session_name.split("/")[-1].rstrip(".session")}.txt', 'a', encoding='utf-8') as file:

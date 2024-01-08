@@ -251,6 +251,7 @@ class TelethonConnect:
             async with client.conversation('@SpamBot') as conv:
                 await conv.send_message('/start')
                 msg = await conv.get_response()
+                print(msg.text)
             if 'Ваш аккаунт временно ограничен' in msg.text:
                 return 'до ' + str(re.findall(r'(?<=сняты ).+(?= \(по)', msg.text)[0])
             elif 'Ваш аккаунт ограничен' in msg.text:

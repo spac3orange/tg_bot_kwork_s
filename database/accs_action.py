@@ -68,7 +68,7 @@ async def db_add_banned_account(phone_number: str) -> None:
 async def db_increment_comments_sent(phone_number: str) -> None:
     try:
         query = "SELECT comments_sent FROM telegram_accounts WHERE phone = $1 FOR UPDATE"
-        result = await db.fetch_one(query, phone_number)
+        result = await db.fetch_row(query, phone_number)
         comments_sent = result['comments_sent'] + 1
         query = "UPDATE telegram_accounts SET comments_sent = $1 WHERE phone = $2"
         await db.execute_query(query, comments_sent, phone_number)

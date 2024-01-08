@@ -252,14 +252,14 @@ class TelethonConnect:
                 await conv.send_message('/start')
                 msg = await conv.get_response()
                 print(msg.text)
-            if 'Ваш аккаунт временно ограничен' in msg.text:
-                return 'до ' + str(re.findall(r'(?<=сняты ).+(?= \(по)', msg.text)[0])
-            elif 'Ваш аккаунт ограничен' in msg.text:
-                return 'Ограничен навсегда'
+            if 'now limited until' in msg.text:
+                return 'Временный спам-блок'
+            elif 'blocked' in msg.text:
+                return 'Постоянный спам-блок'
         except Exception as e:
             logger.error(e)
             return 'Ошибка при выполнении запроса'
-        return 'Нет'
+        return 'Нет ограничений'
 
     async def get_info(self):
         try:

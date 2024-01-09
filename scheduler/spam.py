@@ -25,6 +25,6 @@ async def process_spam(accounts, user_message, timing, task_id):
         pass
     finally:
         await asyncio.sleep(60)
-        await _tasks.db_execute_scheduled_task(int(task_id))
         await inform_admins(f'Задача {task_id} выполнена.')
+        task = asyncio.create_task(_tasks.db_execute_scheduled_task(int(task_id)))
 

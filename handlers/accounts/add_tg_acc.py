@@ -132,7 +132,7 @@ async def add_tg_acc(message: Message, state: FSMContext):
         await data['tg_client'].login_process_code(message.text)
         await message.answer('Аккаунт успешно подключен и добавлен в базу данных.')
         await message.answer(f'Настройки телеграм аккаунтов:', reply_markup=main_kb.accs_settings_menu())
-        await asyncio.create_task(accs_action.db_add_tg_account(data['phone']))
+        task = asyncio.create_task(accs_action.db_add_tg_account(data['phone']))
         logger.info('telegram account successfully added to db')
 
     except errors.SessionPasswordNeededError as e:
@@ -141,7 +141,7 @@ async def add_tg_acc(message: Message, state: FSMContext):
             await data['tg_client'].login_process_code(password=password)
             await message.answer('Аккаунт успешно подключен и добавлен в базу данных.')
             await message.answer(f'Настройки телеграм аккаунтов:', reply_markup=main_kb.accs_settings_menu())
-            await asyncio.create_task(accs_action.db_add_tg_account(data['phone']))
+            task = asyncio.create_task(accs_action.db_add_tg_account(data['phone']))
             logger.info('telegram account successfully added to db')
         except Exception as e:
             logger.error(e)

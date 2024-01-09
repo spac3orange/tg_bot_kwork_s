@@ -13,7 +13,7 @@ async def process_spam(accounts, user_message, timing, task_id):
     await inform_admins(f'Начинаю выполнение задачи {task_id}...')
     for acc in accounts:
         session = TelethonConnect(acc)
-        await asyncio.create_task(session.spam_groups(user_message, timing))
+        task = asyncio.create_task(session.spam_groups(user_message, timing))
         await asyncio.sleep(random.randint(0, 10))
     await asyncio.sleep(60)
     await _tasks.db_execute_scheduled_task(int(task_id))

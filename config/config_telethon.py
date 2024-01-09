@@ -294,7 +294,7 @@ class TelethonConnect:
         except errors.UserDeactivatedBanError as e:
             logger.error(e)
             acc = self.session_name.split("/")[-1].rstrip('.session')
-            await asyncio.create_task(database.accs_action.db_add_banned_account(acc))
+            task = asyncio.create_task(database.accs_action.db_add_banned_account(acc))
             adm_mess = f'Аккаунт {acc} заблокирован.'
             await inform_admins(adm_mess)
             return
@@ -318,19 +318,19 @@ class TelethonConnect:
                     await self.client.send_message(dialog, user_message)
                     print(dialog.title)
                     logger.info(f'Account {self.session_name.split("/")[-1]} successfully sent message to {dialog.title}')
-                    await self.write_history(dialog)
+                    task = asyncio.create_task(self.write_history(dialog))
                     await asyncio.sleep(timing)
 
                 except Exception as e:
                     logger.error(e)
                     print(e)
-                    await self.write_error(dialog, e)
+                    task = asyncio.create_task(self.write_error(dialog, e))
                     continue
 
         except errors.UserDeactivatedBanError as e:
             logger.error(e)
             acc = self.session_name.split("/")[-1].rstrip('.session')
-            await asyncio.create_task(database.accs_action.db_add_banned_account(acc))
+            task = asyncio.create_task(database.accs_action.db_add_banned_account(acc))
             adm_mess = f'Аккаунт {acc} заблокирован.'
             await inform_admins(adm_mess)
 
@@ -345,7 +345,7 @@ class TelethonConnect:
                              f'\nАккаунт: {self.session_name.split("/")[-1].rstrip(".session")}'
                              f'\nГруппа: {dialog.title}'
                              f'\nСообщение отправлено')
-        await asyncio.create_task(database.accs_action.db_increment_comments_sent(self.session_name.split("/")[-1].rstrip(".session")))
+        task = asyncio.create_task(database.accs_action.db_increment_comments_sent(self.session_name.split("/")[-1].rstrip(".session")))
 
     async def write_error(self, dialog, e):
         async with aiofiles.open(f'history/errors_{self.session_name.split("/")[-1].rstrip(".session")}.txt', 'a', encoding='utf-8') as file:

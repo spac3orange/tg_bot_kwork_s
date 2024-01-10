@@ -3,6 +3,8 @@ import aiohttp_socks
 import asyncio
 
 async def check_proxy(proxy: str) -> bool:
+    print(f'Прокси  - {proxy}')
+
     url = 'http://www.telegram.org'  # Замените на нужный вам URL для проверки
     try:
         proxy_url = f'socks5://{proxy}'

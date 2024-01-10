@@ -51,6 +51,7 @@ class Scheduler:
 
         trigger = DateTrigger(run_date=date_time)
         job = self.scheduler.add_job(task_func, trigger=trigger, id=task_id, args=(accounts, user_message, timing, task_id))
+        print(type(job.trigger))
         logger.info(f'Task {task_id} added to the scheduler for {date_str}')
         return job
 

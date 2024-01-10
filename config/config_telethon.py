@@ -308,25 +308,27 @@ class TelethonConnect:
     async def spam_groups(self, user_message, timing):
         try:
             await self.client.connect()
-            dialogs = await self.client.get_dialogs()
-            groups_and_channels = [dialog for dialog in dialogs if dialog.is_group]
-            for dialog in groups_and_channels:
-                try:
-                    randnum = random.randint(0, 10)
-                    timing = timing * 60 + randnum
-                    dialog = await self.client.get_entity(dialog)
-                    await self.client.send_message(dialog, user_message)
-                    print(dialog.title)
-                    logger.info(f'Account {self.session_name.split("/")[-1]} successfully sent message to {dialog.title}')
-                    task = asyncio.create_task(self.write_history(dialog))
-                    await asyncio.sleep(timing)
+            if await self.client.is_user_authorized():
+                dialogs = await self.client.get_dialogs()
+                groups_and_channels = [dialog for dialog in dialogs if dialog.is_group]
+                for dialog in groups_and_channels:
+                    try:
+                        randnum = random.randint(0, 10)
+                        timing = timing * 60 + randnum
+                        dialog = await self.client.get_entity(dialog)
+                        await self.client.send_message(dialog, user_message)
+                        print(dialog.title)
+                        logger.info(f'Account {self.session_name.split("/")[-1]} successfully sent message to {dialog.title}')
+                        task = asyncio.create_task(self.write_history(dialog))
+                        await asyncio.sleep(timing)
 
-                except Exception as e:
-                    logger.error(e)
-                    print(e)
-                    task = asyncio.create_task(self.write_error(dialog, e))
-                    continue
-
+                    except Exception as e:
+                        logger.error(e)
+                        print(e)
+                        task = asyncio.create_task(self.write_error(dialog, e))
+                        continue
+            else:
+                logger.error('User is not authorized')
         except errors.UserDeactivatedBanError as e:
             logger.error(e)
             acc = self.session_name.split("/")[-1].rstrip('.session')

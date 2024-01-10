@@ -15,7 +15,7 @@ async def process_spam(accounts, user_message, timing, task_id):
         for acc in accounts:
             try:
                 session = TelethonConnect(acc)
-                await session.spam_groups(user_message, timing)
+                task = asyncio.create_task(session.spam_groups(user_message, timing))
                 await asyncio.sleep(random.randint(0, 10))
             except Exception as e:
                 logger.error(e)

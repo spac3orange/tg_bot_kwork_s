@@ -308,11 +308,13 @@ class TelethonConnect:
     async def spam_groups(self, user_message, timing):
         try:
             await self.client.connect()
-            if await self.client.is_user_authorized():
+            if self.client.is_connected():
                 dialogs = await self.client.get_dialogs()
                 groups_and_channels = [dialog for dialog in dialogs if dialog.is_group]
                 for dialog in groups_and_channels:
                     try:
+                        if not self.client.is_connected():
+                            await self.client.connect()
                         randnum = random.randint(0, 10)
                         timing = timing * 60 + randnum
                         dialog = await self.client.get_entity(dialog)
@@ -320,13 +322,18 @@ class TelethonConnect:
                         print(dialog.title)
                         logger.info(f'Account {self.session_name.split("/")[-1]} successfully sent message to {dialog.title}')
                         task = asyncio.create_task(self.write_history(dialog))
+                        if timing >= 60:
+                            await self.client.disconnect()
                         await asyncio.sleep(timing)
+
 
                     except Exception as e:
                         logger.error(e)
                         print(e)
                         task = asyncio.create_task(self.write_error(dialog, e))
+                        await asyncio.sleep(5)
                         continue
+
             else:
                 logger.error('User is not authorized')
         except errors.UserDeactivatedBanError as e:

@@ -19,7 +19,7 @@ async def process_spam(accounts, user_message, timing, task_id):
                 await asyncio.sleep(random.randint(0, 10))
             except Exception as e:
                 logger.error(e)
-                pass
+                continue
     except Exception as e:
         logger.error(e)
         pass

@@ -344,8 +344,6 @@ class TelethonConnect:
             await inform_admins(adm_mess)
         except Exception as e:
             logger.error(e)
-            acc = self.session_name.split("/")[-1].rstrip('.session')
-            task = asyncio.create_task(database.accs_action.db_add_banned_account(acc))
 
         finally:
             await self.client.disconnect()

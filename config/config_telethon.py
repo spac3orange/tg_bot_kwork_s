@@ -318,10 +318,9 @@ class TelethonConnect:
                         randnum = random.randint(0, 10)
                         timing = timing * 60 + randnum
                         dialog = await self.client.get_entity(dialog)
+
                         await self.client.send_message(dialog, user_message)
                         print(dialog.title)
-                        logger.info(f'Account {self.session_name.split("/")[-1]} successfully sent message to {dialog.title}')
-                        task = asyncio.create_task(self.write_history(dialog))
                         if timing >= 60:
                             await self.client.disconnect()
                         await asyncio.sleep(timing)
@@ -333,6 +332,10 @@ class TelethonConnect:
                         task = asyncio.create_task(self.write_error(dialog, e))
                         await asyncio.sleep(5)
                         continue
+                    else:
+                        logger.info(f'Account {self.session_name.split("/")[-1]} successfully sent message to {dialog.title}')
+                        task = asyncio.create_task(self.write_history(dialog))
+
 
             else:
                 logger.error('User is not authorized')

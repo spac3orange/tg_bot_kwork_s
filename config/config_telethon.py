@@ -309,23 +309,22 @@ class TelethonConnect:
         try:
             await self.client.connect()
             if self.client.is_connected():
+                connection = True
                 dialogs = await self.client.get_dialogs()
                 groups_and_channels = [dialog for dialog in dialogs if dialog.is_group]
                 for dialog in groups_and_channels:
                     try:
-                        if not self.client.is_connected():
+                        if not connection:
                             await self.client.connect()
                         randnum = random.randint(0, 10)
                         timing = timing * 60 + randnum
                         dialog = await self.client.get_entity(dialog)
 
                         await self.client.send_message(dialog, user_message)
-                        print(dialog.title)
-                        if timing >= 60:
-                            await self.client.disconnect()
+                        print(f'{dialog.title}: Сообщение отправлено')
+                        await self.client.disconnect()
+                        connection = False
                         await asyncio.sleep(timing)
-
-
                     except Exception as e:
                         logger.error(e)
                         print(e)
@@ -335,8 +334,6 @@ class TelethonConnect:
                     else:
                         logger.info(f'Account {self.session_name.split("/")[-1]} successfully sent message to {dialog.title}')
                         task = asyncio.create_task(self.write_history(dialog))
-
-
             else:
                 logger.error('User is not authorized')
         except errors.UserDeactivatedBanError as e:
@@ -349,10 +346,10 @@ class TelethonConnect:
             logger.error(e)
 
         finally:
-            await self.client.disconnect()
+            if self.client.is_connected():
+                await self.client.disconnect()
 
     async def write_history(self, dialog):
-        # Запись отправленного комментария в файл
         async with aiofiles.open(f'history/history_{self.session_name.split("/")[-1].rstrip(".session")}.txt', 'a', encoding='utf-8') as file:
             timestamp = datetime.now().strftime('%d-%m-%Y %H:%M:%S')
             await file.write(f'\n\n|{timestamp}:'

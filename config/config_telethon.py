@@ -317,14 +317,13 @@ class TelethonConnect:
                         if not connection:
                             await self.client.connect()
                         randnum = random.randint(0, 10)
-                        timing = timing * 60 + randnum
+                        timing = 300
                         dialog = await self.client.get_entity(dialog)
 
                         await self.client.send_message(dialog, user_message)
                         print(f'{dialog.title}: Сообщение отправлено')
                         await self.client.disconnect()
-                        connection = False
-                        await asyncio.sleep(timing)
+
                     except Exception as e:
                         logger.error(e)
                         print(e)
@@ -334,6 +333,8 @@ class TelethonConnect:
                     else:
                         logger.info(f'Account {self.session_name.split("/")[-1]} successfully sent message to {dialog.title}')
                         task = asyncio.create_task(self.write_history(dialog))
+                        connection = False
+                        await asyncio.sleep(timing)
             else:
                 logger.error('User is not authorized')
         except errors.UserDeactivatedBanError as e:
